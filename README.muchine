@@ -1,0 +1,184 @@
+This is a small interpreter.
+The virtual CPU has an address width of 16Bit. Memory locations which are
+treated as data locations are handled as 16Bit. The alignment to even or
+odd addresses is unimportant. Opcodes are 8Bits wide.
+The number of operands is not fixed and depends on the opcode but the
+maximum number is 8.
+
+The machine has only one memory (RAM) which is used as data and program
+memory. Since it is only a software machine, no registers except a status
+register are available, because every memory location can be used as a
+register.
+
+The Stack is seperated from the RAM and 8 level deep.
+
+To give a program the ability to communicate with the "outer" world so
+called ICALLs are introduced. They are similiar to syscalls on an OS
+with the difference that not the OS but the interpreter is "called".
+(Hence the name ICALL.)
+The values which may be needed by the ICALLS have to be pushed onto the
+stack and the ICALL will pop them off. This leads to a nealy complete
+decoupling of OPCODE execution and ICALL execution.
+
+Though a RAM location may be interpreted as a word, or double word
+(when multiplying for example) depending on the OPCODE, the operands are
+always 16Bit wide.
+
+Lots of type casts and pointers are used. May the source be useful for
+educational purposes?
+
+-------------------------------------------------------------------------------
+
+Currently implemented OPCODES:
+	NOOP	:	No Operation.
+	
+	INC	:	Increment; Operand0 = address
+	
+	DEC	:	Decrement; Operand0 = address
+	
+	CLR	:	Clear; Operand0 = address
+	
+	LOAD	:	Load; Destination address (Operand0) is loaded with the
+				literal value of Operand1.
+				
+	JMPA	:	Jump to address; Operand0 = address
+	
+	JMPZ	:	Jump on zero; Jumps to the address of Operand0 if the RAM
+				location at the address Operand1 is zero.
+				
+	ADD	:	Add
+				Operand0 = Destination address
+				Operand1 = Address of 1st summand
+				Operand2 = Address of 2nd summand
+				
+	SUB	:	Subtract
+				Operand0 = Destination address
+				Value of RAM at Operand0 = Value of RAM at Operand1 -
+					Value of RAM at Operand2
+					
+	MUL	:	Multiply long
+				Operand0 = Destination address
+				Operand1 = Address of 1st multiplicand
+				Operand2 = Address of 2nd multiplicand
+				
+	DIV	:	Divide long
+				Operand0 = Destination address
+				Operand1 = Divisor address
+				Operand2 = Dividend address
+				
+	AND	:	Bitwise AND
+				Operand0 = Destination address
+				Operand1 = Address of first value
+				Operand2 = Address of second value
+				
+	OR		:	Bitwise OR
+				Operand0 = Destination address
+				Operand1 = Address of first value
+				Operand2 = Address of second value
+				
+	NOT	:	Bitwise NOT
+				Operand0 = Destination address
+				Operand1 = Source address
+				
+	XOR	:	Bitwise XOR
+				Operand0 = Destination address
+				Operand1 = Address of first value
+				Operand2 = Address of second value
+				
+	CMP	:	Compare. Compares the RAM locations pointed to by Operand0 and
+				Operand1 and sets the status register bits accordingly.
+				(Status word is cleared before setting them.)
+				
+	PUSH	:	Pushed value of RAM at address Operand0 onto the stack.
+	
+	POP	:	Pops the topvalue of the stack to the address pointed to by
+				Operand1.
+				
+	MOV	:	Move.
+				Operand0 = destination address
+				Operand1 = source address
+				
+	ICALL	:	Execute ICALL. Operand0 is the ICALL number.
+
+	CALL	:	Increase IPTR, save it onto the stack and jump to the address
+				given by Opcode0
+	
+	RET	:	POP a value off the stack and jump to this address.
+	
+	MOD	:	Modulo (parameters like DIV)
+	
+	JZ1	:	Jump on zero 1 (for jumps after CMP)
+	
+	JZ2	:	Jump on zero 2(for jumps after CMP)
+
+	JNZ1	:	Jump on not zero 1 (for jumps after CMP)
+	
+	JNZ2	:	Jump on not zero 2 (for jumps after CMP)
+	
+	JEQU	:	Jump on equal (for jumps after CMP)
+	
+	JLT	:	Jump on lower than (for jumps after CMP)
+	
+	JGT	:	Jump on greater than (for jumps after CMP)
+	
+	JLTE	:	Jump on lower or equal (for jumps after CMP)
+	
+	JGTE	:	Jump on greater or equal (for jumps after CMP)
+	
+	JNE	:	Jump on not equal (for jumps after CMP)
+
+-------------------------------------------------------------------------------
+
+Currently implemented ICALLS:
+	EXIT	:	The interpreter exits.
+
+	PUTCH	:	Pops a value off the stack and prints the lowbyte to the console.
+
+-------------------------------------------------------------------------------
+
+TODO:
+	* The Overflow, Carry, Zero and Negative flags are missing.
+	* MOVL and LOADL instructions would be nice, because some math-funtions
+	  produce a long (32Bit) result.
+
+FLAWS:
+	* So far, the operands of the opcodes are nearly exclusively addresses.
+	  This leads to the problem that for all literal constants that are used
+	  within a program have to be put somewhere in the RAM because they
+	  can't be embedded into an opcode like usual. (Think of the example
+	  of outputting an 'a'. The 'a' has to be somewhere in the RAM before
+	  it can be outputted.)
+	  This leads to a simpler interpreter but a more complicated Assembler
+	  or bigger executable if the whole ASCII-Table is put in.
+	* So far, there are no indirections. The only way to iterate over an
+	  array or something like is is to write self modifying code which
+	  alters MOV or other instructions. The generation of the self modifying
+	  code should be done by the assembler but it is not intended.
+	* Since the machine is designed as a virtual machine and not a hardware,
+	  I didn't spend time on thinking about code efficiency. The result is a
+	  quite inefficient and large code.
+
+-------------------------------------------------------------------------------
+
+EXAMPLES:
+
+alphabet.mu: This example prints the alphabet over and over again till it is
+killed.
+
+xxd dump:
+0000000: 124e 0040 0010 4800 1301 0010 4e00 1301  .N.@..H.....N...
+0000010: 0001 4e00 124c 004e 0008 4c00 4200 4c00  ..N..L.N..L.B.L.
+0000020: 0600 004c 0005 0b00 0000 0000 0000 0000  ...L............
+0000030: 0000 0000 0000 0000 0000 0000 0000 0000  ................
+0000040: 4100 5b00 0000 0000 0a00 0000 0000 0000  A.[.............
+
+
+putch.mu: Prints the Word MUCHINE and exits.
+
+xxd dump:
+0000000: 104e 0010 4c00 104a 0010 4800 1046 0010  .N..L..J..H..F..
+0000010: 4400 1042 0010 4000 1301 0013 0100 1301  D..B..@.........
+0000020: 0013 0100 1301 0013 0100 1301 0013 0100  ................
+0000030: 1300 0000 0000 0000 0000 0000 0000 0000  ................
+0000040: 4d00 5500 4300 4800 4900 4e00 4500 0a00  M.U.C.H.I.N.E...
+

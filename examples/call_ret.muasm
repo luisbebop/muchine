@@ -1,0 +1,44 @@
+# Test for the CALL and RET instructions
+
+entry
+	JMPA	main
+
+var1
+	NOOP
+	NOOP
+
+put_a
+	LOAD	var1		'a'
+	PUSH	var1
+	ICALL	0x0001
+	RET
+
+put_b
+	LOAD	var1		'b'
+	PUSH	var1
+	ICALL	0x0001
+	RET
+
+put_space
+	LOAD	var1		' '
+	PUSH	var1
+	ICALL	0x0001
+	RET
+
+put_ab
+	CALL	put_a
+	CALL	put_b
+	CALL	put_space
+	RET
+
+exit
+	LOAD	var1		0x000A				# Load a newline
+	PUSH	var1
+	ICALL	0x0001
+	ICALL	0x0000							# Exit call
+	RET
+#--------------------------------------------------------------------------
+main
+	CALL	put_ab
+	CALL	put_ab
+	CALL	exit

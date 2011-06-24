@@ -1,0 +1,13 @@
+The MuAsm Assembler is really a very simple assembler. Its actually smaller
+than the virtual machine itself and has a LOT of restrictions. But it
+simplyfies the Testing of the Machine.
+
+The advantage of the current implementation is, that you don't have to change
+the assembler if you add new instrctions. Simply recompile it and it's ready.
+
+
+
+TODO:
+	* Assembler directives for specifying the size of the executable
+
+	* DT, DB, DW, ...

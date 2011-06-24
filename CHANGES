@@ -1,0 +1,31 @@
+V0.12
+	* Operand buffer is now a pointer, to avoid the copying.
+	* New OPCODES:
+		Modulo
+		Operations which make use of OP_CMP
+	* Corrected a bug in OP_CMP (wrong cast)
+
+V0.13
+	* Removed bug in usage() in muasm.c
+	* Added version number output in usage()
+	* Removed a bug in the label/constant search routine (get_labeladdr)
+	* Added the functionality for using EQUs
+	* Added the getchar() Icall.
+	* Fixed a bug in op_ret. (Return address was not cheked.)
+
+V0.14
+	* Finally, the big switches for the OP-Codes and the ICALLS have been
+	  replaced by function pointers. It sounds silly, but one of the intentions
+	  to write the interpreter was to try out function pointers (because
+	  they are rarely needed).
+	* For op_noop a function has been inserted to be consistent with the
+	  other OP-Codes.
+	* Added a #define for successful OP-Code termination (OPC_OK)
+	* Changed the output when verbose is true.
+	* Added handling for Div by zero.
+V0.14a
+	* GPL License notes inserted into source.
+	* Insert the vim:ts=3:sw=3 statements into all source files.
+	* Make it ready for uploading to sourveforge.net.
+
+vim:ts=3:sw=3

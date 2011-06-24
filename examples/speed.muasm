@@ -1,0 +1,61 @@
+# This program is a long delay loop.
+# Execute it with: muasm 64 speed.mu cnt_inst
+# to see the number of instructions executed. Use the time commands
+# to calculate the MIPS.
+#
+# On my laptop I get:
+# $ time ../muchine 64 speed.mu cnt_inst
+# Executed 99995004 instructions (32 Bit counter)
+#
+# real    0m8.041s
+# user    0m8.040s
+# sys     0m0.001s
+# and thus about 12MIPS.
+
+# Icalls
+_exit			EQU	0x0000
+_putch		EQU	0x0001
+_getchar		EQU	0x0002
+
+# Characters
+newline		EQU	0x000A
+
+entry
+	JMPA	main
+#--------------------------------------------------------------------------
+# Place for variables is hold by NOOPs
+var1
+	NOOP
+	NOOP
+var2
+	NOOP
+	NOOP
+var3
+	NOOP
+	NOOP
+cval
+	NOOP
+	NOOP
+
+
+#--------------------------------------------------------------------------
+main
+	CLR	var3
+	LOAD	cval		5000
+
+
+loop2
+	CLR	var1
+	INC	var2
+	CMP	var2		cval
+	JEQU	exit
+loop1
+	INC	var1
+	CMP	var1		cval
+	JEQU	loop2
+	JMPA	loop1
+
+
+exit
+	ICALL	_exit
+

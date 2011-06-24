@@ -1,0 +1,93 @@
+# Test for getchar. Reads a character from the keyboard and outputs its ASCII
+# value.
+
+# Icalls
+_exit			EQU	0x0000
+_putch		EQU	0x0001
+_getchar		EQU	0x0002
+
+newline		EQU	0x000A
+
+entry
+	JMPA	main
+#--------------------------------------------------------------------------
+# Place for variables is hold by NOOPs
+var1
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+var2
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+var3
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+digit0
+	NOOP
+	NOOP
+digit1
+	NOOP
+	NOOP
+digit2
+	NOOP
+	NOOP
+
+#--------------------------------------------------------------------------
+print_dez
+	POP	var2								# Pop return address off the stack
+	POP	var1								# Pop parameter off the stack
+	PUSH	var2								# Push return address back
+
+	LOAD	var2		100
+	DIV	var3		var1		var2		# Divide the value by 100
+	MOV	digit2	var3					# Move first digit into digit2 (hundreds)
+
+	MUL	var3		var3		var2
+	SUB	var1		var1		var3		# Subtract the hundreds from the value
+	
+	LOAD	var2		10
+	DIV	var3		var1		var2		# Divide by 10
+	MOV	digit1	var3					# Move the second digit (tens)
+	
+	MUL	var3		var3		var2
+	SUB	var1		var1		var3		# Subtract the tens from value
+	MOV	digit0	var1					# Move the first digit (ones)
+	
+	LOAD	var1		'0'					# Make ASCII chars out of the values
+	ADD	digit0	digit0	var1
+	ADD	digit1	digit1	var1
+	ADD	digit2	digit2	var1
+
+	PUSH	digit2
+	ICALL	_putch
+	
+	PUSH	digit1
+	ICALL	_putch
+	
+	PUSH	digit0
+	ICALL	_putch
+	
+	RET
+
+
+print_nl
+	LOAD	var1		newline
+	PUSH	var1
+	ICALL	_putch
+	RET
+
+#--------------------------------------------------------------------------
+main
+	ICALL	_getchar							# Read a character
+	
+	CALL	print_nl
+	CALL	print_dez						# Convert to decimal and output it
+	CALL	print_nl
+
+	ICALL	_exit
+

@@ -1,0 +1,7 @@
+# Comments begin with a '#'
+
+	LOAD	0x000e	'!'	# This is a comment
+	PUSH	0x000e
+	ICALL	0x0001
+	ICALL 0x0000
+

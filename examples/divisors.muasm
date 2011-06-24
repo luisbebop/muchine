@@ -1,0 +1,234 @@
+# Reads 4 decimal digits and calculates all divisors of this value.
+
+# Icalls
+_exit			EQU	0x0000
+_putch		EQU	0x0001
+_getchar		EQU	0x0002
+
+newline		EQU	0x000A
+
+entry
+	JMPA	main
+#--------------------------------------------------------------------------
+# Place for variables is hold by NOOPs
+base
+	NOOP
+	NOOP
+divi
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+result
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+var1
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+var2
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+var3
+	NOOP
+	NOOP
+	NOOP
+	NOOP
+digit0
+	NOOP
+	NOOP
+digit1
+	NOOP
+	NOOP
+digit2
+	NOOP
+	NOOP
+digit3
+	NOOP
+	NOOP
+
+#--------------------------------------------------------------------------
+print_dez
+	POP	var2								# Pop return address off the stack
+	POP	var1								# Pop parameter off the stack
+	PUSH	var2								# Push return address back
+
+	LOAD	var2		1000
+	DIV	var3		var1		var2		# Divide the value by 1000
+	MOV	digit3	var3					# Move first digit into digit3 (thousand)
+
+	MUL	var3		var3		var2
+	SUB	var1		var1		var3		# Subtract thousadns from the value
+
+	LOAD	var2		100
+	DIV	var3		var1		var2		# Divide the value by 100
+	MOV	digit2	var3					# Move 2nd digit into digit2 (hundreds)
+
+	MUL	var3		var3		var2
+	SUB	var1		var1		var3		# Subtract the hundreds from the value
+	
+	LOAD	var2		10
+	DIV	var3		var1		var2		# Divide by 10
+	MOV	digit1	var3					# Move the 3rd digit (tens)
+	
+	MUL	var3		var3		var2
+	SUB	var1		var1		var3		# Subtract the tens from value
+	MOV	digit0	var1					# Move the last digit (ones)
+	
+	LOAD	var1		'0'					# Make ASCII chars out of the values
+	ADD	digit0	digit0	var1
+	ADD	digit1	digit1	var1
+	ADD	digit2	digit2	var1
+	ADD	digit3	digit3	var1
+
+	PUSH	digit3
+	ICALL	_putch
+
+	PUSH	digit2
+	ICALL	_putch
+	
+	PUSH	digit1
+	ICALL	_putch
+	
+	PUSH	digit0
+	ICALL	_putch
+	
+	RET
+
+read_dez
+	ICALL	_getchar							# Read a 4 characters
+	ICALL	_getchar							# Remove \n from input buffer
+	POP	var1
+	
+	ICALL	_getchar
+	ICALL	_getchar
+	POP	var1
+	
+	ICALL	_getchar
+	ICALL	_getchar
+	POP	var1
+	
+	ICALL	_getchar
+
+	POP	var1								# Get ones digit
+	LOAD	var2		'0'
+	SUB	var3		var1		var2
+
+	POP	var1								# Get tens digit
+	LOAD	var2		'0'					# This line makes code reading easier
+	SUB	var1		var1		var2
+	LOAD	var2		10
+	MUL	var1		var1		var2
+	ADD	var3		var3		var1
+	
+	POP	var1								# Get hundreds digit
+	LOAD	var2		'0'					# This line makes code reading easier
+	SUB	var1		var1		var2
+	LOAD	var2		100
+	MUL	var1		var1		var2
+	ADD	var3		var3		var1
+	
+	POP	var1								# Get thousands digit
+	LOAD	var2		'0'					# This line makes code reading easier
+	SUB	var1		var1		var2
+	LOAD	var2		1000
+	MUL	var1		var1		var2
+	ADD	var3		var3		var1
+
+	POP	var1								# Pop off return address
+	PUSH	var3								# Push result onto stack
+	PUSH	var1								# Restore return address
+	
+	RET
+
+print_nl
+	LOAD	var1		newline
+	PUSH	var1
+	ICALL	_putch
+	RET
+
+print_txt1
+	LOAD	var1		'D'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'i'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'v'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'i'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		's'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'o'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'r'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		's'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		' '
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'o'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		'f'
+	PUSH	var1
+	ICALL	_putch
+	
+	LOAD	var1		' '
+	PUSH	var1
+	ICALL	_putch
+	
+	RET
+
+#--------------------------------------------------------------------------
+main
+	
+	CALL	read_dez
+	POP	base
+
+	CALL	print_nl
+	CALL	print_txt1
+	PUSH	base
+	CALL	print_dez
+	CALL	print_nl
+
+	LOAD	divi	1
+	
+divloop
+	MOD	result	base	divi			# Perform modulo operation
+	JMPZ	output	result				# Test for result == 0
+	JMPA	next
+output
+	PUSH	divi								# Push current divisor onto stack
+	CALL	print_dez						# Output divisor
+	CALL	print_nl							# Output newline
+next
+	INC	divi								# Increment for next divisor
+	CMP	divi	base						# Compare with base
+	JLTE	divloop							# Nextr iteration if divi <= base
+	
+	ICALL	_exit
+

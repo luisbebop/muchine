@@ -1,0 +1,55 @@
+# This small Program outputs a to z ten times.
+# Space are not seen as seperators, but tabs are. This is a bit
+# painful in the beginning, but makes the assembler simpler.
+
+entry
+	JMPA	main
+#--------------------------------------------------------------------------
+# Place for variables is hold by NOOPs
+counter
+	NOOP
+	NOOP
+counter2
+	NOOP
+	NOOP
+res
+	NOOP
+	NOOP
+ival
+	NOOP
+	NOOP
+
+#--------------------------------------------------------------------------
+main
+	LOAD	counter2	10
+loop2
+	LOAD	counter	26
+	LOAD	ival		'Z'
+loop
+	DEC	counter
+
+	SUB	res		ival		counter	# Produce ASCII char in 'res'
+	PUSH	res
+	ICALL	0x0001							# Output the character
+	
+	LOAD	res		' '					# Load a space
+	PUSH	res
+	ICALL	0x0001							# Output the space
+	
+	JMPZ	next		counter
+	JMPA	loop
+
+next
+	LOAD	res		0x000A				# Load a newline
+	PUSH	res
+	ICALL	0x0001
+
+	DEC	counter2
+	JMPZ	exit		counter2
+	JMPA	loop2
+	
+exit
+	LOAD	res		0x000A				# Load a newline
+	PUSH	res
+	ICALL	0x0001
+	ICALL	0x0000							# Exit call

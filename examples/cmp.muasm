@@ -1,0 +1,276 @@
+# This program is intended to test the CMP intruction.
+# (Doesn't test all the J* functions)
+
+VALUE1	EQU	4589
+VALUE2	EQU	234
+
+NEWLINE	EQU	0x000A
+
+entry
+	JMPA	main
+#--------------------------------------------------------------------------
+# Place for variables is hold by NOOPs
+var1
+	NOOP
+	NOOP
+var2
+	NOOP
+	NOOP
+work
+	NOOP
+	NOOP
+param
+	NOOP
+	NOOP
+
+#--------------------------------------------------------------------------
+# Functions
+putch
+	PUSH	param
+	ICALL	0x0001
+	RET
+
+p_nl
+	LOAD	param		NEWLINE
+	CALL	putch
+	RET
+
+p_true
+	LOAD	param		't'
+	CALL	putch
+	LOAD	param		'r'
+	CALL	putch
+	LOAD	param		'u'
+	CALL	putch
+	LOAD	param		'e'
+	CALL	putch
+	CALL	p_nl
+	RET
+
+p_false
+	LOAD	param		'f'
+	CALL	putch
+	LOAD	param		'a'
+	CALL	putch
+	LOAD	param		'l'
+	CALL	putch
+	LOAD	param		's'
+	CALL	putch
+	LOAD	param		'e'
+	CALL	putch
+	CALL	p_nl
+	RET
+
+p_z1
+	LOAD	param		'z'
+	CALL	putch
+	LOAD	param		'1'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_z2
+	LOAD	param		'z'
+	CALL	putch
+	LOAD	param		'2'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_nz1
+	LOAD	param		'n'
+	CALL	putch
+	LOAD	param		'z'
+	CALL	putch
+	LOAD	param		'1'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_nz2
+	LOAD	param		'n'
+	CALL	putch
+	LOAD	param		'z'
+	CALL	putch
+	LOAD	param		'2'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_equ
+	LOAD	param		'e'
+	CALL	putch
+	LOAD	param		'q'
+	CALL	putch
+	LOAD	param		'u'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_lt
+	LOAD	param		'l'
+	CALL	putch
+	LOAD	param		't'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_gt
+	LOAD	param		'g'
+	CALL	putch
+	LOAD	param		't'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_lte
+	LOAD	param		'l'
+	CALL	putch
+	LOAD	param		't'
+	CALL	putch
+	LOAD	param		'e'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_gte
+	LOAD	param		'g'
+	CALL	putch
+	LOAD	param		't'
+	CALL	putch
+	LOAD	param		'e'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+
+p_ne
+	LOAD	param		'n'
+	CALL	putch
+	LOAD	param		'e'
+	CALL	putch
+	LOAD	param		' '
+	CALL	putch
+	RET
+	
+exit
+	ICALL	0x0000
+	RET
+
+#--------------------------------------------------------------------------
+main
+	LOAD	var1		VALUE1	# Insert a number for testing
+	LOAD	var2		VALUE2	# Insert a number for testing
+
+	CMP	var1		var2
+	
+	# Test JZ1
+	CALL	p_z1
+	JZ1	print1
+
+	CALL	p_false			# Print false
+	JMPA	print1e
+print1
+	CALL	p_true			# Print true
+print1e
+
+	# Test JZ2
+	CALL	p_z2
+	JZ2	print2
+
+	CALL	p_false			# Print false
+	JMPA	print2e
+print2
+	CALL	p_true			# Print true
+print2e
+
+	# Test JNZ1
+	CALL	p_nz1
+	JNZ1	print3
+
+	CALL	p_false			# Print false
+	JMPA	print3e
+print3
+	CALL	p_true			# Print true
+print3e
+
+	# Test JNZ2
+	CALL	p_nz2
+	JNZ2	print4
+
+	CALL	p_false			# Print false
+	JMPA	print4e
+print4
+	CALL	p_true			# Print true
+print4e
+
+	# Test JEQU
+	CALL	p_equ
+	JEQU	print5
+
+	CALL	p_false			# Print false
+	JMPA	print5e
+print5
+	CALL	p_true			# Print true
+print5e
+
+	# Test JLT
+	CALL	p_lt
+	JLT	print6
+
+	CALL	p_false			# Print false
+	JMPA	print6e
+print6
+	CALL	p_true			# Print true
+print6e
+
+	# Test JGT
+	CALL	p_gt
+	JGT	print7
+
+	CALL	p_false			# Print false
+	JMPA	print7e
+print7
+	CALL	p_true			# Print true
+print7e
+
+	# Test JLTE
+	CALL	p_lte
+	JLTE	print8
+
+	CALL	p_false			# Print false
+	JMPA	print8e
+print8
+	CALL	p_true			# Print true
+print8e
+
+	# Test JGTE
+	CALL	p_gte
+	JGTE	print9
+
+	CALL	p_false			# Print false
+	JMPA	print9e
+print9
+	CALL	p_true			# Print true
+print9e
+
+	# Test JNE
+	CALL	p_ne
+	JNE	print10
+
+	CALL	p_false			# Print false
+	JMPA	print10e
+print10
+	CALL	p_true			# Print true
+print10e
+
+
+	CALL	exit
